@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+node_modules
+vendor
+storage/logs
+storage/debugbar
+tests
+README.md
+docker-compose*.yaml
+.editorconfig
+.phpunit*
+phpunit.xml

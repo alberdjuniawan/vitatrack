@@ -1,0 +1,117 @@
+services:
+  web:
+    build:
+      context: .
+      target: web
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_web
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    volumes:
+      - app_storage:/var/www/html/public/storage:ro
+    depends_on:
+      - php
+
+  php:
+    build:
+      context: .
+      target: app
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_php
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www/html
+      - app_storage:/var/www/html/storage/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build:
+      context: .
+      target: app
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_worker
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "
+        until PGPASSWORD=\"$DB_PASSWORD\" pg_isready -h \"$DB_HOST\" -U \"$DB_USERNAME\" -d \"$DB_DATABASE\" -q; do sleep 2; done;
+        until redis-cli -h \"$REDIS_HOST\" -p \"$REDIS_PORT\" ping 2>/dev/null | grep -q PONG; do sleep 2; done;
+        exec php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --verbose
+      "
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  scheduler:
+    build:
+      context: .
+      target: app
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_scheduler
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "
+        until PGPASSWORD=\"$DB_PASSWORD\" pg_isready -h \"$DB_HOST\" -U \"$DB_USERNAME\" -d \"$DB_DATABASE\" -q; do sleep 2; done;
+        until redis-cli -h \"$REDIS_HOST\" -p \"$REDIS_PORT\" ping 2>/dev/null | grep -q PONG; do sleep 2; done;
+        while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done
+      "
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-app}_pgadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+  app_storage:
