@@ -14,4 +14,7 @@ Schedule::call(function () {
     User::query()->update(['needs_weekly_assessment' => true]);
     
     Log::info('Weekly cron: The weekly assessment button (PHQ-9/GAD-7) has been re-enabled for all users.');
-})->weeklyOn(0, '00:01')->name('reset-weekly-assessment')->withoutOverlapping();
+})->weeklyOn(0, '00:01')
+  ->timezone('Asia/Jakarta')
+  ->name('reset-weekly-assessment')
+  ->withoutOverlapping();

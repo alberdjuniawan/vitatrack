@@ -9,6 +9,7 @@ use App\Events\HealthLogCreated;
 use App\Http\Requests\StoreDailyLogRequest;
 use App\Http\Requests\StoreWeeklyAssessmentRequest;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class HealthLogController extends Controller
 {
@@ -55,9 +56,14 @@ class HealthLogController extends Controller
     public function storeWeekly(StoreWeeklyAssessmentRequest $request)
     {
         $validated = $request->validated();
+        $user = $request->user();
+
+        $timezone = $user->timezone ?: 'Asia/Jakarta';
+        
+        $localLogDate = Carbon::now($timezone)->format('Y-m-d');
 
         $todayLog = HealthLog::firstOrCreate(
-            ['user_id' => $request->user()->id, 'log_date' => now()->format('Y-m-d')],
+            ['user_id' => $user->id, 'log_date' => $localLogDate],
             ['mood_score' => 5, 'mood_label' => 'neutral', 'stress_level' => 0, 'sleep_hours' => 0, 'sleep_quality' => 0, 'activity_type' => 'sedentary', 'activity_minutes' => 0, 'water_intake_ml' => 0]
         );
 
@@ -71,9 +77,9 @@ class HealthLogController extends Controller
         $gad7Score = array_sum($validated['gad7_responses']);
         $phq9Score = array_sum($validated['phq9_responses']);
 
-        GenerateWeeklyInsight::dispatch($request->user(), $gad7Score, $phq9Score);
+        GenerateWeeklyInsight::dispatch($user, $gad7Score, $phq9Score);
 
-        $request->user()->update(['needs_weekly_assessment' => false]);
+        $user->update(['needs_weekly_assessment' => false]);
 
         return $this->successResponse(
             null, 
