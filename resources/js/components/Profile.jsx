@@ -1,17 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { 
     KeyIcon, HeartIcon, IdentificationIcon, 
-    CheckCircleIcon, XMarkIcon, InformationCircleIcon
+    XMarkIcon, InformationCircleIcon, ChevronDownIcon, CheckCircleIcon
 } from '@heroicons/react/24/solid';
+
+const genderOptions = [
+    { value: 'male', label: 'Laki-laki' },
+    { value: 'female', label: 'Perempuan' }
+];
+
+const timezoneOptions = [
+    { value: 'Asia/Jakarta', label: 'Asia/Jakarta (WIB)' },
+    { value: 'Asia/Makassar', label: 'Asia/Makassar (WITA)' },
+    { value: 'Asia/Jayapura', label: 'Asia/Jayapura (WIT)' }
+];
+
+const CustomDropdown = ({ value, options, onChange, className, size = 'normal', placeholder = 'Pilih...' }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isFlipped, setIsFlipped] = useState(false);
+    const dropdownRef = useRef(null);
+    const menuRef = useRef(null);
+    const [menuStyle, setMenuStyle] = useState({});
+
+    const toggleDropdown = (e) => {
+        e.preventDefault();
+        if (!isOpen && dropdownRef.current) {
+            const rect = dropdownRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom - 12; 
+            const spaceAbove = rect.top - 12;
+            const MAX_HEIGHT = 260; 
+            
+            let style = { position: 'fixed', left: rect.left, width: rect.width, zIndex: 999999 };
+            let flip = false;
+
+            if (spaceBelow < MAX_HEIGHT && spaceAbove > spaceBelow) {
+                style.bottom = window.innerHeight - rect.top + 6;
+                style.maxHeight = `${Math.min(MAX_HEIGHT, spaceAbove)}px`;
+                flip = true;
+            } else {
+                style.top = rect.bottom + 6;
+                style.maxHeight = `${Math.min(MAX_HEIGHT, spaceBelow)}px`;
+            }
+
+            setMenuStyle(style);
+            setIsFlipped(flip);
+        }
+        setIsOpen(!isOpen);
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            const clickedButton = dropdownRef.current?.contains(event.target);
+            const clickedMenu = menuRef.current?.contains(event.target);
+            if (!clickedButton && !clickedMenu) setIsOpen(false);
+        };
+        const handleScrollResize = (e) => {
+            if (menuRef.current && menuRef.current.contains(e.target)) return;
+            setIsOpen(false);
+        };
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            window.addEventListener('scroll', handleScrollResize, true); 
+            window.addEventListener('resize', handleScrollResize);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('scroll', handleScrollResize, true);
+            window.removeEventListener('resize', handleScrollResize);
+        };
+    }, [isOpen]);
+
+    const selectedOption = options.find(opt => opt.value === value);
+    const btnClass = size === 'small' ? "px-4 py-2.5 text-xs md:text-sm rounded-xl" : "px-4 py-3 text-sm rounded-xl";
+    const menuClass = size === 'small' ? "px-4 py-2.5 text-xs md:text-sm" : "px-4 py-3 text-sm";
+
+    return (
+        <>
+            <div className={`relative ${className}`} ref={dropdownRef}>
+                <button 
+                    onClick={toggleDropdown}
+                    className={`w-full bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-teal-500 shadow-sm flex items-center justify-between gap-2 transition-all font-bold ${btnClass} ${!selectedOption ? 'text-slate-400' : 'text-slate-700'}`}
+                >
+                    <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
+                    <ChevronDownIcon className={`w-4 h-4 shrink-0 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+            </div>
+            {isOpen && createPortal(
+                <div ref={menuRef} style={menuStyle} className={`bg-white border border-slate-100 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-y-auto custom-scrollbar py-1.5 font-ubuntu ${isFlipped ? 'animate-dropdown-up origin-bottom' : 'animate-dropdown origin-top'}`}>
+                    {options.map(opt => (
+                        <button key={opt.value} onClick={(e) => { e.preventDefault(); onChange(opt.value); setIsOpen(false); }} className={`w-full text-left font-bold transition-colors truncate ${menuClass} ${value === opt.value ? 'bg-teal-50 text-teal-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'}`} title={opt.label}>
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>, document.body
+            )}
+        </>
+    );
+};
 
 export default function Profile() {
     const { refreshLayoutUser, showToast } = useOutletContext();
 
     const [formData, setFormData] = useState({
         name: '', email: '', date_of_birth: '', gender: '', 
-        height_cm: '', weight_kg: '', timezone: 'Asia/Jakarta', existing_conditions: []
+        height_cm: '', weight_kg: '', timezone: '', existing_conditions: []
     });
 
     const [newCondition, setNewCondition] = useState('');
@@ -31,7 +126,7 @@ export default function Profile() {
                     gender: user.gender || '', 
                     height_cm: user.height_cm || '',
                     weight_kg: user.weight_kg || '',
-                    timezone: user.timezone || 'Asia/Jakarta',
+                    timezone: user.timezone || '', 
                     existing_conditions: Array.isArray(user.existing_conditions) 
                         ? user.existing_conditions 
                         : (typeof user.existing_conditions === 'string' ? JSON.parse(user.existing_conditions || '[]') : [])
@@ -48,7 +143,19 @@ export default function Profile() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await axios.put('/api/user/profile', formData);
+            let finalConditions = [...formData.existing_conditions];
+            if (newCondition.trim() !== '') {
+                if (!finalConditions.includes(newCondition.trim())) {
+                    finalConditions.push(newCondition.trim());
+                }
+                setNewCondition('');
+            }
+
+            const payload = { ...formData, existing_conditions: finalConditions };
+
+            await axios.put('/api/user/profile', payload);
+            setFormData(payload);
+            
             showToast("Profil berhasil diperbarui", "success");
             refreshLayoutUser(); 
         } catch (error) {
@@ -167,31 +274,27 @@ export default function Profile() {
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Lahir</label>
                                 <input 
                                     type="date" value={formData.date_of_birth} onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 font-bold text-slate-700 transition-all"
+                                    className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 font-bold transition-all ${formData.date_of_birth ? 'text-slate-700' : 'text-slate-400'}`}
                                 />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Jenis Kelamin</label>
-                                <select 
-                                    value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                                    className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 font-bold transition-all ${formData.gender === '' ? 'text-slate-400' : 'text-slate-700'}`}
-                                >
-                                    <option value="" disabled>Pilih Jenis Kelamin</option>
-                                    <option value="male" className="text-slate-700">Laki-laki</option>
-                                    <option value="female" className="text-slate-700">Perempuan</option>
-                                </select>
+                                <CustomDropdown 
+                                    value={formData.gender} 
+                                    options={genderOptions} 
+                                    placeholder="Pilih Jenis Kelamin"
+                                    onChange={(val) => setFormData({...formData, gender: val})} 
+                                />
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Zona Waktu</label>
-                            <select 
-                                value={formData.timezone} onChange={(e) => setFormData({...formData, timezone: e.target.value})}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 font-bold text-slate-700 transition-all"
-                            >
-                                <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
-                                <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
-                                <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
-                            </select>
+                            <CustomDropdown 
+                                value={formData.timezone} 
+                                options={timezoneOptions} 
+                                placeholder="Pilih Zona Waktu"
+                                onChange={(val) => setFormData({...formData, timezone: val})} 
+                            />
                         </div>
                     </div>
                 </div>
@@ -205,22 +308,22 @@ export default function Profile() {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Tinggi Badan (cm)</label>
-                            <div className="flex items-center bg-slate-50 border rounded-xl overflow-hidden focus-within:ring-2 transition-colors h-12 border-slate-200 focus-within:ring-teal-500">
+                            <div className="flex bg-slate-50 border rounded-xl overflow-hidden focus-within:ring-2 transition-colors border-slate-200 focus-within:ring-teal-500">
                                 <input 
                                     type="number" value={formData.height_cm} onKeyDown={blockInvalidChar} onChange={(e) => handleNumberChange('height_cm', e.target.value, 300)} placeholder="Contoh: 170"
-                                    className="flex-1 text-center bg-transparent outline-none font-bold h-full hide-arrows text-slate-700 placeholder:text-slate-300 placeholder:font-medium" 
+                                    className="flex-1 w-full text-center bg-transparent outline-none font-bold py-3 px-4 hide-arrows text-slate-700 placeholder:text-slate-300 placeholder:font-medium" 
                                 />
-                                <span className="bg-slate-100 text-slate-400 font-bold px-4 h-full flex items-center border-l border-slate-200 text-sm">cm</span>
+                                <div className="bg-slate-100 text-slate-400 font-bold px-4 flex items-center justify-center border-l border-slate-200 text-sm shrink-0">cm</div>
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Berat Badan (kg)</label>
-                            <div className="flex items-center bg-slate-50 border rounded-xl overflow-hidden focus-within:ring-2 transition-colors h-12 border-slate-200 focus-within:ring-teal-500">
+                            <div className="flex bg-slate-50 border rounded-xl overflow-hidden focus-within:ring-2 transition-colors border-slate-200 focus-within:ring-teal-500">
                                 <input 
                                     type="number" value={formData.weight_kg} onKeyDown={blockInvalidChar} onChange={(e) => handleNumberChange('weight_kg', e.target.value, 500)} placeholder="Contoh: 65"
-                                    className="flex-1 text-center bg-transparent outline-none font-bold h-full hide-arrows text-slate-700 placeholder:text-slate-300 placeholder:font-medium" 
+                                    className="flex-1 w-full text-center bg-transparent outline-none font-bold py-3 px-4 hide-arrows text-slate-700 placeholder:text-slate-300 placeholder:font-medium" 
                                 />
-                                <span className="bg-slate-100 text-slate-400 font-bold px-4 h-full flex items-center border-l border-slate-200 text-sm">kg</span>
+                                <div className="bg-slate-100 text-slate-400 font-bold px-4 flex items-center justify-center border-l border-slate-200 text-sm shrink-0">kg</div>
                             </div>
                         </div>
                     </div>
@@ -251,7 +354,7 @@ export default function Profile() {
                                 isSaving || isProfileIncomplete ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none' : 'bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-200/50'
                             }`}
                         >
-                            {isSaving ? 'Menyimpan...' : <><CheckCircleIcon className="w-5 h-5 stroke-2" /> Simpan Perubahan</>}
+                            {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
                         </button>
                     </div>
                 </div>
@@ -264,6 +367,13 @@ export default function Profile() {
                 @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
                 .animate-fade-in-up { animation: fade-in-up 0.4s ease-out forwards; }
+                @keyframes dropdown-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-dropdown { animation: dropdown-down 0.2s ease-out forwards; transform-origin: top; }
+                @keyframes dropdown-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-dropdown-up { animation: dropdown-up 0.2s ease-out forwards; }
+                .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #e2e8f0; border-radius: 20px; }
                 .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
                 .hide-arrows { -moz-appearance: textfield; }
             `}} />
