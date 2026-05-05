@@ -40,7 +40,6 @@ services:
     command: >
       sh -c "
         until PGPASSWORD=\"$DB_PASSWORD\" pg_isready -h \"$DB_HOST\" -U \"$DB_USERNAME\" -d \"$DB_DATABASE\" -q; do sleep 2; done;
-        until redis-cli -h \"$REDIS_HOST\" -p \"$REDIS_PORT\" ping 2>/dev/null | grep -q PONG; do sleep 2; done;
         exec php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --verbose
       "
     env_file:
@@ -62,7 +61,6 @@ services:
     command: >
       sh -c "
         until PGPASSWORD=\"$DB_PASSWORD\" pg_isready -h \"$DB_HOST\" -U \"$DB_USERNAME\" -d \"$DB_DATABASE\" -q; do sleep 2; done;
-        until redis-cli -h \"$REDIS_HOST\" -p \"$REDIS_PORT\" ping 2>/dev/null | grep -q PONG; do sleep 2; done;
         while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done
       "
     env_file:
@@ -95,6 +93,8 @@ services:
     image: redis:7-alpine
     container_name: ${COMPOSE_PROJECT_NAME:-app}_redis
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     command: redis-server --save 60 1 --loglevel warning
 
   pgadmin:
