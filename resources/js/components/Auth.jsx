@@ -86,55 +86,64 @@ export default function AuthPage() {
         setLoading(false);
     };
 
+    const scrollToForm = () => {
+        document.getElementById('auth-form-section').scrollIntoView({ behavior: 'smooth' });
+    };
+
     return (
-        <div className="min-h-screen flex font-ubuntu bg-white overflow-hidden">
+        <div className="min-h-screen flex flex-col font-ubuntu bg-white overflow-x-hidden">
             
-            {/* KIRI: BRANDING (GRID PUTIH + SPOTLIGHT POINTER) */}
             <div 
-                className="hidden lg:flex lg:w-1/2 flex-col justify-center p-12 md:p-16 relative bg-white border-r border-slate-100 z-20 overflow-hidden group"
+                className="flex w-full flex-col justify-center items-center p-8 sm:p-12 lg:p-24 relative bg-white border-b border-slate-100 z-20 overflow-hidden group min-h-screen shrink-0"
                 onMouseMove={handleMouseMove}
             >
-                {/* Latar Belakang Kotak-kotak (Grid) */}
-                <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3rem_3rem]"></div>
+                <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3rem_3rem] lg:bg-[size:4rem_4rem]"></div>
                 
-                {/* Efek Spotlight Mengikuti Pointer */}
                 <div 
-                    className="absolute z-0 pointer-events-none rounded-full w-[600px] h-[600px] bg-teal-100/50 blur-[80px] transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+                    className="absolute z-0 pointer-events-none rounded-full w-[600px] h-[600px] lg:w-[800px] lg:h-[800px] bg-teal-100/50 blur-[80px] lg:blur-[120px] transition-opacity duration-500 opacity-0 lg:group-hover:opacity-100"
                     style={{
-                        left: mousePos.x - 300, 
-                        top: mousePos.y - 300,
+                        left: mousePos.x - (window.innerWidth >= 1024 ? 400 : 300), 
+                        top: mousePos.y - (window.innerWidth >= 1024 ? 400 : 300),
                     }}
                 ></div>
 
-                <div className="relative z-10 text-left flex flex-col items-start max-w-xl animate-fade-in-up">
-                    <h1 className="text-5xl xl:text-6xl font-black tracking-tight text-slate-800 mb-6 drop-shadow-sm">
-                        VITATRACK
+                {/* Teks center sempurna buat HP maupun PC */}
+                <div className="relative z-10 w-full flex flex-col items-center text-center max-w-md lg:max-w-3xl mx-auto animate-fade-in-up">
+                    <h1 className="text-5xl sm:text-6xl lg:text-8xl font-unbounded font-black tracking-tight text-slate-800 mb-6 lg:mb-8 drop-shadow-sm">
+                        VITATRACK.
                     </h1>
-                    <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                    <p className="text-slate-500 text-base sm:text-lg lg:text-xl leading-relaxed font-medium">
                         Pantau metrik fisik, kualitas tidur, dan stabilitas emosionalmu. Biarkan kecerdasan buatan menyusun wawasan harian terbaik khusus untukmu.
                     </p>
                 </div>
+
+                <div className="absolute bottom-10 lg:bottom-12 inset-x-0 w-full flex justify-center z-30">
+                    <button 
+                        onClick={scrollToForm}
+                        className="flex flex-col items-center animate-bounce text-teal-500 hover:text-teal-600 transition-colors cursor-pointer focus:outline-none"
+                    >
+                        <span className="text-sm lg:text-base font-ubuntu font-medium mb-1 text-teal-600/80">mulai</span>
+                        <svg className="w-6 h-6 lg:w-8 lg:h-8 text-teal-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            {/* KANAN: FORM CARD (GRADASI TEAL DI BELAKANG) */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative z-10 bg-gradient-to-br from-teal-50 via-teal-100/50 to-white">
+            <div id="auth-form-section" className="w-full flex items-center justify-center py-16 px-6 sm:p-12 relative z-10 bg-gradient-to-br from-teal-50 via-teal-100/50 to-white min-h-screen">
                 
-                {/* Hiasan Blur Background di Kanan */}
-                <div className="absolute top-[10%] right-[10%] w-72 h-72 bg-teal-300 rounded-full blur-[100px] opacity-40 pointer-events-none animate-pulse-slow"></div>
+                <div className="absolute top-[10%] right-[10%] lg:right-[20%] w-72 h-72 lg:w-96 lg:h-96 bg-teal-300 rounded-full blur-[100px] opacity-40 pointer-events-none animate-pulse-slow"></div>
 
                 <div className="max-w-[420px] w-full bg-white/90 backdrop-blur-xl p-8 sm:p-10 rounded-[2rem] shadow-[0_8px_40px_rgb(13,148,136,0.1)] border border-white relative z-10">
                     
                     <div className="text-left mb-8 animate-fade-in transition-all duration-300">
-                        <h1 className="lg:hidden text-2xl font-black tracking-tight text-teal-600 mb-8">
-                            VITATRACK
-                        </h1>
                         <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-                            {isRegisterMode ? 'Daftar' : 'Masuk'}
+                            {isRegisterMode ? 'Buat Akun Baru' : 'Selamat Datang'}
                         </h2>
                         <p className="text-slate-500 mt-2 text-sm">
                             {isRegisterMode 
-                                ? 'Lengkapi data di bawah untuk membuat akun baru.' 
-                                : 'Masuk ke akunmu untuk melanjutkan perjalanan.'}
+                                ? 'Lengkapi data di bawah untuk bergabung dengan Vitatrack.' 
+                                : 'Masukkan kredensial Anda untuk melanjutkan perjalanan.'}
                         </p>
                     </div>
 
@@ -144,15 +153,15 @@ export default function AuthPage() {
                         </div>
                     )}
 
-                    <form key={isRegisterMode ? 'register-form' : 'login-form'} onSubmit={handleSubmit} className="space-y-4">
+                    <form key={isRegisterMode ? 'register-form' : 'login-form'} onSubmit={handleSubmit} className="space-y-5">
                         
                         {isRegisterMode && (
                             <div className="animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
                                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Nama Lengkap</label>
                                 <input 
                                     type="text" value={name} onChange={(e) => setName(e.target.value)} required={isRegisterMode}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400 placeholder:font-medium"
-                                    placeholder="Alberd Juniawan"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 placeholder:font-normal"
+                                    placeholder="Contoh: Budi Santoso"
                                 />
                             </div>
                         )}
@@ -161,39 +170,39 @@ export default function AuthPage() {
                             <label className="block text-sm font-bold text-slate-700 mb-1.5">Alamat Email</label>
                             <input 
                                 type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-700 font-medium placeholder:text-slate-400 placeholder:font-medium"
-                                placeholder="nama@email.com"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 placeholder:font-normal"
+                                placeholder="contoh@email.com"
                             />
                         </div>
 
                         {isRegisterMode ? (
-                            <div className="grid grid-cols-2 gap-3 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+                            <div className="grid grid-cols-2 gap-4 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
                                 <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-1.5">Sandi</label>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1.5">Kata Sandi</label>
                                     <input 
                                         type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-700 font-bold tracking-widest placeholder:text-slate-400 placeholder:tracking-normal placeholder:font-medium"
-                                        placeholder="••••••••"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 placeholder:font-normal"
+                                        placeholder="Min. 8 karakter"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5">Ulangi Sandi</label>
                                     <input 
                                         type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} required={isRegisterMode}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-700 font-bold tracking-widest placeholder:text-slate-400 placeholder:tracking-normal placeholder:font-medium"
-                                        placeholder="••••••••"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 placeholder:font-normal"
+                                        placeholder="Konfirmasi"
                                     />
                                 </div>
                             </div>
                         ) : (
                             <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                                <label className="block text-sm font-bold text-slate-700 mb-1.5">Sandi</label>
+                                <label className="block text-sm font-bold text-slate-700 mb-1.5">Kata Sandi</label>
                                 <input 
                                     type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-700 font-bold tracking-widest placeholder:text-slate-400 placeholder:tracking-normal placeholder:font-medium"
-                                    placeholder="••••••••"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 placeholder:font-normal"
+                                    placeholder="Masukkan kata sandi"
                                 />
-                                <div className="flex items-center justify-between mt-3 mb-2">
+                                <div className="flex items-center justify-between mt-4 mb-2">
                                     <label className="flex items-center gap-2 cursor-pointer group">
                                         <input type="checkbox" className="w-4 h-4 text-teal-600 rounded border-slate-300 focus:ring-teal-500 cursor-pointer" />
                                         <span className="text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors">Ingat saya</span>
@@ -203,11 +212,11 @@ export default function AuthPage() {
                             </div>
                         )}
 
-                        <div className="animate-fade-in-up" style={{ animationDelay: isRegisterMode ? '0.2s' : '0.15s' }}>
+                        <div className="animate-fade-in-up pt-2" style={{ animationDelay: isRegisterMode ? '0.2s' : '0.15s' }}>
                             <button 
                                 type="submit"  
                                 disabled={loading}
-                                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 md:py-4 rounded-xl shadow-lg shadow-teal-200/50 transition-all flex justify-center items-center gap-2 disabled:bg-teal-400 mt-4 tracking-wide text-base"
+                                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 md:py-4 rounded-xl shadow-lg shadow-teal-200/50 transition-all flex justify-center items-center gap-2 disabled:bg-teal-400 tracking-wide text-base"
                             >
                                 {loading ? (
                                     <>
@@ -219,8 +228,8 @@ export default function AuthPage() {
                         </div>
                     </form>
 
-                    <p className="text-center mt-6 text-slate-500 text-sm animate-fade-in" style={{ animationDelay: '0.25s' }}>
-                        {isRegisterMode ? 'Sudah punya akun? ' : 'Belum punya akun? '}
+                    <p className="text-center mt-8 text-slate-500 text-sm animate-fade-in" style={{ animationDelay: '0.25s' }}>
+                        {isRegisterMode ? 'Sudah memiliki akun? ' : 'Belum memiliki akun? '}
                         <button 
                             onClick={toggleMode} 
                             type="button"
@@ -233,9 +242,18 @@ export default function AuthPage() {
             </div>
 
             <style dangerouslySetInnerHTML={{__html: `
-                @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Ubuntu:wght@300;400;500;700&display=swap');
                 
                 .font-ubuntu { font-family: 'Ubuntu', sans-serif !important; }
+                .font-unbounded { font-family: 'Unbounded', sans-serif !important; }
+
+                input:-webkit-autofill,
+                input:-webkit-autofill:hover, 
+                input:-webkit-autofill:focus, 
+                input:-webkit-autofill:active{
+                    -webkit-box-shadow: 0 0 0 30px #f8fafc inset !important;
+                    -webkit-text-fill-color: #1e293b !important;
+                }
 
                 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes fade-in-up { 
