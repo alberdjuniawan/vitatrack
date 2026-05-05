@@ -2,11 +2,11 @@ FROM node:22-alpine AS frontend
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
-# COPY source files agar Vite bisa membaca vite.config.js dan /resources
+
 COPY . .
-# Build assets, tambahkan || true agar jika gagal tidak menghentikan container builder
+
 RUN npm run build || true
-# Pastikan folder build dibuat agar step di builder PHP tidak error
+
 RUN mkdir -p public/build
 
 FROM php:8.4-fpm AS builder
@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
         pdo pdo_pgsql pgsql \
-        mbstring zip gd bcmath opcache \
+        mbstring zip gd bcmath opcache pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis opcache
 
@@ -42,7 +42,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 COPY . .
-# Mengambil hasil build Frontend (Aman karena kita sudah force mkdir public/build)
+
 COPY --from=frontend /app/public/build ./public/build
 
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev \
