@@ -131,7 +131,7 @@ export default function Insights() {
                                 <button 
                                     key={insight.id} 
                                     onClick={() => setSelectedInsight({ type: 'daily', ...insight })}
-                                    className="bg-white/90 backdrop-blur-sm border border-teal-50 p-6 md:p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(13,148,136,0.04)] hover:shadow-[0_8px_30px_rgb(13,148,136,0.1)] hover:border-teal-200 transition-all text-left flex flex-col group h-full min-h-[280px]"
+                                    className="bg-white/90 backdrop-blur-sm border border-teal-50 p-6 md:p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(13,148,136,0.04)] hover:shadow-[0_8px_30px_rgb(13,148,136,0.1)] hover:border-teal-200 transition-all text-left flex flex-col group/card h-full min-h-[280px]"
                                 >
                                     <div className="flex justify-between items-start mb-4 w-full gap-2">
                                         <div className="bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1.5 shrink-0">
@@ -144,14 +144,14 @@ export default function Insights() {
                                         )}
                                     </div>
                                     
-                                    <h3 className="font-extrabold text-lg text-slate-800 mb-3 group-hover:text-teal-600 transition-colors line-clamp-1">{insight.title}</h3>
+                                    <h3 className="font-extrabold text-lg text-slate-800 mb-3 group-hover/card:text-teal-600 transition-colors line-clamp-1">{insight.title}</h3>
                                     
                                     <p className="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-4">
                                         {insight.text.replace(/\n/g, ' ')}
                                     </p>
                                     
                                     <div className="mt-auto flex items-center gap-1 text-teal-600 font-bold text-sm pt-2">
-                                        Baca detail <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        Baca detail <ArrowRightIcon className="w-4 h-4 group-hover/card:translate-x-1 transition-transform" />
                                     </div>
                                 </button>
                             ))}
@@ -174,7 +174,7 @@ export default function Insights() {
                                 <button 
                                     key={insight.id} 
                                     onClick={() => setSelectedInsight({ type: 'weekly', ...insight })}
-                                    className="bg-white/90 backdrop-blur-sm border border-teal-50 p-6 md:p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(13,148,136,0.04)] hover:shadow-[0_8px_30px_rgb(13,148,136,0.1)] hover:border-teal-200 transition-all text-left flex flex-col group h-full min-h-[300px]"
+                                    className="bg-white/90 backdrop-blur-sm border border-teal-50 p-6 md:p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(13,148,136,0.04)] hover:shadow-[0_8px_30px_rgb(13,148,136,0.1)] hover:border-teal-200 transition-all text-left flex flex-col group/card h-full min-h-[300px]"
                                 >
                                     <div className="flex justify-between items-start mb-4 w-full gap-2">
                                         <div className="bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1.5 shrink-0">
@@ -186,14 +186,14 @@ export default function Insights() {
                                         </div>
                                     </div>
                                     
-                                    <h3 className="font-extrabold text-lg text-slate-800 mb-3 group-hover:text-teal-600 transition-colors line-clamp-1">{insight.title}</h3>
+                                    <h3 className="font-extrabold text-lg text-slate-800 mb-3 group-hover/card:text-teal-600 transition-colors line-clamp-1">{insight.title}</h3>
                                     
                                     <p className="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-4">
                                         {insight.text.replace(/\n/g, ' ')}
                                     </p>
                                     
                                     <div className="mt-auto flex items-center gap-1 text-teal-600 font-bold text-sm border-t border-slate-50 pt-4 w-full">
-                                        Lihat Laporan Lengkap <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        Lihat Laporan Lengkap <ArrowRightIcon className="w-4 h-4 group-hover/card:translate-x-1 transition-transform" />
                                     </div>
                                 </button>
                             ))}
