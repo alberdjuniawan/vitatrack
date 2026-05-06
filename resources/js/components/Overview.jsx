@@ -519,13 +519,13 @@ export default function Overview() {
     return (
         <div className="w-full flex flex-col gap-6 md:gap-8 animate-fade-in pb-10 relative z-10">
             
-            <div className="bg-white/90 backdrop-blur-md p-5 md:p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(13,148,136,0.06)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border border-white shrink-0 relative z-20 mx-0 md:mx-0 w-full">
+            <div className="bg-white/90 backdrop-blur-md p-5 md:p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(13,148,136,0.06)] flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 md:gap-6 border border-white relative z-20 w-full">
                 <div>
                     <h2 className="text-xl md:text-2xl font-extrabold text-slate-800 tracking-tight">Dashboard Overview</h2>
                     <p className="text-slate-500 font-medium mt-1 text-sm hidden sm:block">Ringkasan aktivitas dan rekomendasi harian untukmu.</p>
                 </div>
 
-                <div className="sm:hidden w-full shrink-0">
+                <div className="sm:hidden w-full">
                     <CustomDropdown 
                         value={activeView} 
                         options={viewOptions} 
@@ -533,7 +533,7 @@ export default function Overview() {
                     />
                 </div>
 
-                <div className="hidden sm:flex w-full xl:w-auto bg-slate-50 border border-slate-200 rounded-xl p-1 shrink-0 overflow-x-auto custom-scrollbar no-scrollbar">
+                <div className="hidden sm:flex w-full xl:w-auto bg-slate-50 border border-slate-200 rounded-xl p-1 overflow-x-auto custom-scrollbar no-scrollbar max-w-full">
                     {viewOptions.slice(0, 5).map(tab => (
                         <button
                             key={tab.value}
