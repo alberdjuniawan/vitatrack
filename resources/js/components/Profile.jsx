@@ -103,6 +103,7 @@ const CustomDropdown = ({ value, options, onChange, className, size = 'normal', 
 
 export default function Profile() {
     const { refreshLayoutUser, showToast } = useOutletContext();
+    const todayDate = new Date().toLocaleDateString('en-CA');
 
     const [formData, setFormData] = useState({
         name: '', email: '', date_of_birth: '', gender: '', 
@@ -273,7 +274,14 @@ export default function Profile() {
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Tanggal Lahir</label>
                                 <input 
-                                    type="date" value={formData.date_of_birth} onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
+                                    type="date" 
+                                    max={todayDate}
+                                    value={formData.date_of_birth} 
+                                    onChange={(e) => {
+                                        let selected = e.target.value;
+                                        if (selected > todayDate) selected = todayDate;
+                                        setFormData({...formData, date_of_birth: selected});
+                                    }}
                                     className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500 font-bold transition-all ${formData.date_of_birth ? 'text-slate-700' : 'text-slate-400'}`}
                                 />
                             </div>
