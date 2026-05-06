@@ -681,17 +681,7 @@ export default function Overview() {
                         </div>
                         
                         <div className="space-y-4 w-full">
-                            {dailyCardStatus !== 'completed' ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
-                                    <ClipboardDocumentCheckIcon className="w-12 h-12 text-slate-200 mb-3" />
-                                    <p className="text-slate-500 font-medium text-sm">Selesaikan Check-in Harian terlebih dahulu untuk membuka Evaluasi Mingguan.</p>
-                                </div>
-                            ) : weeklyCardStatus === 'active' ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
-                                    <ClipboardDocumentCheckIcon className="w-12 h-12 text-slate-200 mb-3" />
-                                    <p className="text-slate-500 font-medium text-sm">Selesaikan Tes Mingguan di atas untuk melihat analisis mendalam klinis dari AI.</p>
-                                </div>
-                            ) : weeklyInsight ? (
+                            {weeklyInsight ? (
                                 <>
                                     <div className="bg-[#F4FAFA] p-5 rounded-2xl border border-teal-50 hover:border-teal-200 hover:shadow-sm transition-all animate-fade-in-up flex flex-col">
                                         <p className="text-slate-600 font-medium leading-relaxed text-sm whitespace-pre-wrap line-clamp-3 mb-3">{weeklyInsight?.text}</p>
@@ -713,9 +703,21 @@ export default function Overview() {
                                         </div>
                                     </div>
                                 </>
+                            ) : weeklyCardStatus === 'active' ? (
+                                dailyCardStatus !== 'completed' ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
+                                        <ClipboardDocumentCheckIcon className="w-12 h-12 text-slate-200 mb-3" />
+                                        <p className="text-slate-500 font-medium text-sm">Selesaikan Check-in Harian terlebih dahulu untuk membuka Evaluasi Mingguan.</p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
+                                        <ClipboardDocumentCheckIcon className="w-12 h-12 text-slate-200 mb-3" />
+                                        <p className="text-slate-500 font-medium text-sm">Selesaikan Tes Mingguan di atas untuk melihat analisis mendalam klinis dari AI.</p>
+                                    </div>
+                                )
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
-                                    <ArrowPathIcon className="w-8 h-8 text-teal-600 animate-spin mb-3" />
+                                    <ArrowPathIcon className="w-8 h-8 text-slate-300 animate-spin mb-3" />
                                     <p className="text-slate-500 font-medium text-sm">Menunggu analisis AI...</p>
                                 </div>
                             )}
