@@ -228,6 +228,9 @@ export default function Logs() {
     const currentMonthNum = new Date().getMonth() + 1; 
     const targetMonth = selectedMonth || currentMonthNum;
     const targetMonthStr = String(targetMonth).padStart(2, '0');
+    const daysInMonth = new Date(currentYear, targetMonth, 0).getDate();
+    const firstDayOfMonth = new Date(currentYear, targetMonth - 1, 1).getDay();
+    const emptyDaysCount = (firstDayOfMonth + 6) % 7; 
 
     const filteredLogs = logs.filter(log => {
         if (!log.log_date) return false;
@@ -373,9 +376,13 @@ export default function Logs() {
                             <div key={day} className="font-extrabold text-slate-400 text-[9px] md:text-xs text-center uppercase tracking-wider mb-1 md:mb-2">{day}</div>
                         ))}
                         
-                        {[1, 2, 3, 4].map(i => <div key={`empty-${i}`} className="min-h-[70px] md:min-h-[140px] rounded-md md:rounded-xl bg-slate-50/50 border border-slate-100 opacity-50"></div>)}
+                        {/* Render kotak kosong sesuai awal hari bulan tersebut */}
+                        {Array.from({ length: emptyDaysCount }).map((_, i) => (
+                            <div key={`empty-${i}`} className="min-h-[70px] md:min-h-[140px] rounded-md md:rounded-xl bg-slate-50/50 border border-slate-100 opacity-50"></div>
+                        ))}
                         
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map(date => {
+                        {/* Render tanggal dinamis sesuai jumlah hari beneran */}
+                        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(date => {
                             const logData = logs.find(l => {
                                 const [y, m, d] = l.log_date.split('-');
                                 return parseInt(y) === currentYear && parseInt(m) === targetMonth && parseInt(d) === date;
