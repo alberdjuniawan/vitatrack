@@ -674,18 +674,20 @@ export default function Overview() {
                     </div>
 
                     {/* AI ASSISTANT CARD (WEEKLY INSIGHT) */}
-                    <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-white flex flex-col flex-1 overflow-hidden min-h-[350px] shadow-[0_4px_20px_rgb(13,148,136,0.06)] mt-2">
-                        <div className="flex items-center gap-3 mb-6 shrink-0"><SparklesIcon className="w-8 h-8 text-teal-600" /><h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">AI Health Assistant</h2></div>
-                        <p className="text-base font-bold text-teal-700 mb-6 shrink-0">Evaluasi Mingguan</p>
+                    <div className="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-[2rem] border border-white flex flex-col h-fit shadow-[0_4px_20px_rgb(13,148,136,0.06)] mt-2">
+                        <div className="flex items-center gap-3 mb-5 shrink-0">
+                            <SparklesIcon className="w-7 h-7 text-teal-600" />
+                            <h3 className="font-extrabold text-lg text-slate-800">Insight Mingguan</h3>
+                        </div>
                         
-                        <div className="space-y-4 overflow-y-auto pr-2 pb-4 flex-1 custom-scrollbar">
+                        <div className="space-y-4 w-full">
                             {dailyCardStatus !== 'completed' ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                                <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
                                     <ClipboardDocumentCheckIcon className="w-12 h-12 text-slate-200 mb-3" />
                                     <p className="text-slate-500 font-medium text-sm">Selesaikan Check-in Harian terlebih dahulu untuk membuka Evaluasi Mingguan.</p>
                                 </div>
                             ) : weeklyCardStatus === 'active' ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                                <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
                                     <ClipboardDocumentCheckIcon className="w-12 h-12 text-slate-200 mb-3" />
                                     <p className="text-slate-500 font-medium text-sm">Selesaikan Tes Mingguan di atas untuk melihat analisis mendalam klinis dari AI.</p>
                                 </div>
@@ -701,18 +703,18 @@ export default function Overview() {
                                         </button>
                                     </div>
                                     <div className="flex gap-4 mt-4 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                                        <div className="flex-1 bg-white border border-slate-100 p-4 rounded-xl text-center">
+                                        <div className="flex-1 bg-white border border-slate-100 p-4 rounded-xl text-center flex flex-col justify-center">
                                             <span className="block text-xs font-bold text-slate-400 mb-1">Status Kecemasan</span>
                                             <span className="font-extrabold text-sm text-teal-700">{weeklyInsight?.gad7_status || '-'}</span>
                                         </div>
-                                        <div className="flex-1 bg-white border border-slate-100 p-4 rounded-xl text-center">
+                                        <div className="flex-1 bg-white border border-slate-100 p-4 rounded-xl text-center flex flex-col justify-center">
                                             <span className="block text-xs font-bold text-slate-400 mb-1">Status Depresi</span>
                                             <span className="font-extrabold text-sm text-teal-700">{weeklyInsight?.phq9_status || '-'}</span>
                                         </div>
                                     </div>
                                 </>
                             ) : (
-                                <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                                <div className="flex flex-col items-center justify-center h-full text-center p-4 py-8">
                                     <ArrowPathIcon className="w-8 h-8 text-teal-600 animate-spin mb-3" />
                                     <p className="text-slate-500 font-medium text-sm">Menunggu analisis AI...</p>
                                 </div>
