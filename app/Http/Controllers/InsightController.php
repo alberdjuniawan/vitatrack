@@ -36,6 +36,7 @@ class InsightController extends Controller
         if ($logToday) {
             $latestDaily = Insight::where('user_id', $userId)
                 ->where('type', 'daily_insight')
+                ->whereDate('created_at', $todayDate)
                 ->latest()
                 ->first();
         }
@@ -44,6 +45,12 @@ class InsightController extends Controller
             ->where('type', 'weekly_insight')
             ->latest()
             ->first();
+
+        if ($logToday && $logToday->gad7_responses !== null) {
+            if ($latestWeekly && Carbon::parse($latestWeekly->created_at)->timezone($timezone)->format('Y-m-d') !== $todayDate) {
+                $latestWeekly = null;
+            }
+        }
 
         $latestLog = HealthLog::where('user_id', $userId)
             ->orderBy('log_date', 'desc')
